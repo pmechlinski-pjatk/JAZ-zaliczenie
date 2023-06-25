@@ -6,15 +6,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 import java.sql.Timestamp;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 public class Entry {
 //    @Schema(accessMode = Schema.AccessMode.AUTO)
     private String currency;
-    private int queryDays;
-    private double result;
-    private Date date;
+    private double median;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private Timestamp timestamp;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -22,6 +22,13 @@ public class Entry {
 
     public Entry() {
 
+    }
+    public Entry(String currency, LocalDate startDate, LocalDate endDate, double median, Timestamp timestamp) {
+        this.currency = currency;
+        this.median = median;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.timestamp = timestamp;
     }
 
     public void setId(Long id) {
@@ -32,11 +39,4 @@ public class Entry {
         return id;
     }
 
-    public Entry(String currency, int queryDays, double result, Date date) {
-        this.currency = currency;
-        this.queryDays = queryDays;
-        this.result = result;
-        this.date = date;
-        this.timestamp = new Timestamp(date.getTime());
-    }
 }

@@ -25,10 +25,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.time.LocalDate;
+
 @Tag(name = "NBP_APP_API", description = "API for connecting to the NBP endpoint")
 @CrossOrigin(origins = "http://localhost:8081")
 @RestController
-@RequestMapping("/average")
+@RequestMapping("/median")
 public class QueryRestController {
 
     @Autowired
@@ -40,7 +42,7 @@ public class QueryRestController {
     @Autowired
     DateService date;
 
-    @Operation(summary = "Get average value of a given currency in PLN from a given number of last days", tags = { "currency", "get" })
+    @Operation(summary = "Get median value of a given currency in PLN from a dates between the range of two dates, themself included.", tags = { "currency", "get" })
     @ApiResponses({
             @ApiResponse(responseCode = "201", content = {
                     @Content(schema = @Schema(implementation = Entry.class), mediaType = "application/json") }),
@@ -48,10 +50,17 @@ public class QueryRestController {
             @ApiResponse(responseCode = "400", content = { @Content(schema = @Schema()) }) })
     @GetMapping(value = "{currency}")
     @ResponseBody
-    public ResponseEntity<String> getRequestForCurrency(@RequestParam(defaultValue = "1") int days, @PathVariable String currency) throws HttpClientErrorException.BadRequest, HttpClientErrorException.NotFound, HttpClientErrorException.TooManyRequests {
+    public ResponseEntity<String> getRequestForCurrency(@RequestParam LocalDate startDate, @RequestParam LocalDate endDate, @PathVariable String currency) throws HttpClientErrorException.BadRequest, HttpClientErrorException.NotFound, HttpClientErrorException.TooManyRequests {
+        // Check input for this specific task
+        if (!startDate.isBefore(endDate)) {
+            System.out.println("[RestController][ERROR] " + date.getTime() + " Rest Controller identified a wrong request syntax formatting - start date is not before the end date!");
+            return new ResponseEntity<String>("Start date is not before the end date!",HttpStatusCode.valueOf(400));
+
+        }
+
         Entry requestResult;
         try {
-            requestResult = restService.getNbpData(currency, days);
+            requestResult = restService.getNbpData(currency, startDate, endDate);
         } catch (NullPointerException e) {
             System.out.println("[RestController][ERROR] " + date.getTime() + " Rest Controller was unable to reach the requested endpoint!");
             return new ResponseEntity<>(HttpStatusCode.valueOf(404));
