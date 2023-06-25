@@ -45,6 +45,7 @@ public class RestService {
         Iterator<Double> itr = keys.iterator();
         List<Double> sortedDayMids = new ArrayList<>();
 
+        // I could make some use from dates, e.g. get median date, so I didn't removed dictionary structure step
         while (itr.hasNext()) {
             Double i = itr.next();
             sortedDayMids.add(i);
